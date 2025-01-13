@@ -6,9 +6,9 @@ import Layout from "./components/Layout/layout";
 function App() {
   return (
     <Router>
-      <Layout>
+      {/* <Layout> */}
         <AppRoutes />
-      </Layout>
+      {/* </Layout> */}
     </Router>
   );
 }

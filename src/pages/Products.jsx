@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
-
+import { Link } from "react-router-dom";
 const ProductsPage = () => {
   const [products] = useState([
     {
@@ -215,13 +215,17 @@ const ProductsPage = () => {
                 </span>
               </div>
               <p className="text-gray-600">{product.price}</p>
-              <button
+              <Link to="/product/:id" className="text-blue-600 hover:text-blue-800 font-medium flex items-center space-x-2">
+                  <FaEye />
+                  <span>See Details</span>
+              </Link>
+              {/* <button
                 onClick={() => openProductDetails(product)}
                 className="text-blue-600 hover:text-blue-800 font-medium flex items-center space-x-2"
               >
                 <FaEye />
                 <span>See Details</span>
-              </button>
+              </button> */}
             </div>
 
             {/* Action Buttons */}
@@ -283,3 +287,161 @@ const ProductsPage = () => {
 };
 
 export default ProductsPage;
+
+
+
+
+
+
+
+
+
+// import React, { useState, useEffect } from "react";
+// import { FaEye, FaEdit, FaTrash } from "react-icons/fa";
+
+// const ProductsPage = () => {
+//   const [products, setProducts] = useState([]);
+//   const [selectedProduct, setSelectedProduct] = useState(null);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState("");
+
+//   useEffect(() => {
+//     const fetchProducts = async () => {
+//       try {
+//         const response = await fetch(
+//           "https://backend-server-0ddt.onrender.com/api/store/MP-v-pet36/products/"
+//         );
+//         if (!response.ok) {
+//           throw new Error("Failed to fetch products");
+//         }
+//         const data = await response.json();
+//         setProducts(data); // Assuming the API returns an array
+//       } catch (error) {
+//         setError(error.message);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchProducts();
+//   }, []);
+
+//   const openProductDetails = (product) => {
+//     setSelectedProduct(product);
+//   };
+
+//   const closeProductDetails = () => {
+//     setSelectedProduct(null);
+//   };
+
+//   const handleEdit = (id) => {
+//     alert(`Edit product with id: ${id}`);
+//   };
+
+//   const handleDelete = (id) => {
+//     alert(`Delete product with id: ${id}`);
+//   };
+
+//   return (
+//     <div className="max-w-7xl mx-auto p-4 sm:p-8 bg-gray-50 rounded-2xl shadow-xl space-y-8">
+//       <h2 className="text-4xl font-semibold text-gray-900 mb-8">
+//         Product Dashboard
+//       </h2>
+
+//       {loading ? (
+//         <p className="text-center text-gray-700 text-xl">Loading...</p>
+//       ) : error ? (
+//         <p className="text-center text-red-500 text-xl">{error}</p>
+//       ) : (
+//         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+//           {products.map((product) => (
+//             <div
+//               key={product.id}
+//               className="bg-white rounded-xl border-2 border-gray-200 shadow-lg"
+//             >
+//               <img
+//                 src={product.imageUrl}
+//                 alt={product.name}
+//                 className="w-full h-48 object-cover rounded-t-xl"
+//               />
+//               <div className="p-4 sm:p-6 space-y-4">
+//                 <div className="flex justify-between items-center">
+//                   <h3 className="text-xl font-semibold text-gray-800">
+//                     {product.name}
+//                   </h3>
+//                   <span
+//                     className={`text-xs font-bold px-2 py-1 rounded-full ${
+//                       product.status === "Active" ? "bg-green-500" : "bg-red-500"
+//                     }`}
+//                   >
+//                     {product.status}
+//                   </span>
+//                 </div>
+//                 <p className="text-gray-600">{product.price}</p>
+//                 <button
+//                   onClick={() => openProductDetails(product)}
+//                   className="text-blue-600 hover:text-blue-800 font-medium flex items-center space-x-2"
+//                 >
+//                   <FaEye />
+//                   <span>See Details</span>
+//                 </button>
+//               </div>
+
+//               <div className="p-4 flex justify-between items-center">
+//                 <button
+//                   onClick={() => handleEdit(product.id)}
+//                   className="bg-yellow-400 text-white p-2 rounded-lg hover:bg-yellow-500 transition"
+//                 >
+//                   <FaEdit />
+//                 </button>
+//                 <button
+//                   onClick={() => handleDelete(product.id)}
+//                   className="bg-red-500 text-white p-2 rounded-lg hover:bg-red-600 transition"
+//                 >
+//                   <FaTrash />
+//                 </button>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       )}
+
+//       {selectedProduct && (
+//         <div
+//           className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 transition-all duration-500"
+//           onClick={closeProductDetails}
+//         >
+//           <div
+//             className="bg-white p-6 sm:p-8 rounded-xl shadow-xl w-4/5 sm:w-3/4 md:w-1/2 lg:w-1/3 transform transition-all duration-300"
+//             onClick={(e) => e.stopPropagation()}
+//           >
+//             <h3 className="text-2xl font-semibold text-gray-800">
+//               {selectedProduct.name}
+//             </h3>
+//             <p className="text-gray-600 mt-4">{selectedProduct.description}</p>
+//             <p className="text-gray-900 text-xl font-bold mt-4">
+//               {selectedProduct.price}
+//             </p>
+//             <p
+//               className={`mt-4 text-xs font-bold px-2 py-1 rounded-full ${
+//                 selectedProduct.status === "Active"
+//                   ? "bg-green-500"
+//                   : "bg-red-500"
+//               }`}
+//             >
+//               {selectedProduct.status}
+//             </p>
+//             <button
+//               onClick={closeProductDetails}
+//               className="mt-6 text-white bg-red-500 hover:bg-red-700 px-6 py-3 rounded-lg"
+//             >
+//               Close
+//             </button>
+//           </div>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default ProductsPage;
