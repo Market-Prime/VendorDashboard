@@ -12,6 +12,7 @@ import Vendoremailconfirmation from "../src/pages/Vendoremailconfirmation";
 import FinalSection from "../src/pages/FinalSection";
 import Layout from "../src/components/Layout/layout";
 import ProductDetails from "../src/pages/ProductDetails";
+import AddProduct from "../src/pages/AddProduct";
 
 const AppRoutes = () => {
 
@@ -32,6 +33,7 @@ const AppRoutes = () => {
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/product/:id" element={<ProductDetails />} />
+            <Route path="/add-product" element={<AddProduct />}  />
           </Routes>
         </Layout>
 
