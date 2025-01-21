@@ -13,12 +13,15 @@ import FinalSection from "../src/pages/FinalSection";
 import Layout from "../src/components/Layout/layout";
 import ProductDetails from "../src/pages/ProductDetails";
 import AddProduct from "../src/pages/AddProduct";
+import AccountInfo from "../src/pages/AccountInfo";
 
 const AppRoutes = () => {
 
   const location = useLocation();
 
-  const noLayoutPage = ["/", "/vendoraccount", "/vendor-email-confirmation/:token", "/finalsection"];
+  const token = localStorage.getItem("vendorToken");
+
+  const noLayoutPage = ["/", "/vendoraccount", "/vendor-email-confirmation/token", "/finalsection", "/confirmeaccount"];
 
   const isLayoutRequired = !noLayoutPage.includes(location.pathname);
   return (
@@ -41,7 +44,8 @@ const AppRoutes = () => {
           <Routes>
              <Route path="/" element={<VendorsLogin />} />
              <Route path="/vendoraccount" element={<VendorsAccount />} />
-             <Route path="/vendor-email-confirmation/:token" element={<Vendoremailconfirmation />} />
+             <Route path="/confirmeaccount" element={<AccountInfo/>} />
+             <Route path="/vendor-email-confirmation/token" element={<Vendoremailconfirmation />} />
              <Route path="/finalsection" element={<FinalSection />} />
           </Routes>
          

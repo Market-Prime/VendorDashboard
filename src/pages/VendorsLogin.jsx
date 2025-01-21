@@ -24,7 +24,7 @@ const VendorLogin = () => {
 
     try {
       const response = await axios.post(
-        "https://backend-server-0ddt.onrender.com/api/account/login",
+        "https://mb.marketprime.io/api/account/login",
         { email, password }
       );
       localStorage.setItem("accessToken", response.data?.access);
