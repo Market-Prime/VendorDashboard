@@ -32,10 +32,11 @@ const VendorsAccount = () => {
       const response = await axios.post(
         `https://mb.marketprime.io/api/account/register/?type=vendor`,
         formdata
-      )
-
+      );
+  
       const token = response.data.token;
-
+      localStorage.setItem("vendorToken", token); // Save the token in localStorage
+  
       toast.success(
         response.data.message ||
           "Registration Successful, check your email to confirm your account",
@@ -50,15 +51,21 @@ const VendorsAccount = () => {
           style: { backgroundColor: "green" },
         }
       );
+
+      if (response.data.statusCode === 201) {
+        const name = localStorage.setItem("name", response.data.business_name);
+        console.log("THe name", name);
+      }
+  
       setTimeout(() => {
-        navigate("/vendor-email-confirmation/:token");
+        navigate("/confirmeaccount"); // Redirect with token in URL
       }, 5000);
     } catch (error) {
       const errorMessage =
         error.response && error.response.data && error.response.data.error
           ? error.response.data.error
           : error.message;
-
+  
       toast.error(errorMessage, {
         position: "top-right",
         autoClose: 5000,
@@ -71,6 +78,7 @@ const VendorsAccount = () => {
       });
     }
   };
+  
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">

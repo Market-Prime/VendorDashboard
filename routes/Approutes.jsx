@@ -14,6 +14,7 @@ import Layout from "../src/components/Layout/layout";
 import ProductDetails from "../src/pages/ProductDetails";
 import AddProduct from "../src/pages/AddProduct";
 import SetupStore from "../src/pages/StoreSetup";
+import AccountInfo from "../src/pages/AccountInfo";
 
 const AppRoutes = () => {
     const location = useLocation();
@@ -44,8 +45,9 @@ const AppRoutes = () => {
                 <Routes>
                     <Route path="/" element={<VendorsLogin />} />
                     <Route path="/vendoraccount" element={<VendorsAccount />} />
-                    <Route
-                        path="/vendor-email-confirmation/:token"
+                    <Route path="/confirmeaccount" element={<AccountInfo/>} />
+             <Route
+                        path="/vendor-email-confirmation/token"
                         element={<Vendoremailconfirmation />}
                     />
                     <Route path="/kyc" element={<FinalSection />} />
