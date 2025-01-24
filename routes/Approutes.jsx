@@ -13,43 +13,47 @@ import FinalSection from "../src/pages/FinalSection";
 import Layout from "../src/components/Layout/layout";
 import ProductDetails from "../src/pages/ProductDetails";
 import AddProduct from "../src/pages/AddProduct";
+import SetupStore from "../src/pages/StoreSetup";
 
 const AppRoutes = () => {
+    const location = useLocation();
 
-  const location = useLocation();
+    const noLayoutPattern =
+        /^(\/|\/vendoraccount|\/vendor-email-confirmation\/.*|\/kyc|\/store-setup)$/;
+    const isLayoutRequired = !noLayoutPattern.test(location.pathname);
 
-  const noLayoutPage = ["/", "/vendoraccount", "/vendor-email-confirmation/:token", "/finalsection"];
+    return (
+        <>
+            {isLayoutRequired ? (
+                <Layout>
+                    <Routes>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/orders" element={<Orders />} />
+                        <Route path="/products" element={<Products />} />
 
-  const isLayoutRequired = !noLayoutPage.includes(location.pathname);
-  return (
-    <>
-      {isLayoutRequired ? (
-        <Layout>
-          <Routes>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/products" element={<Products />} />
-      
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/product/:id" element={<ProductDetails />} />
-            <Route path="/add-product" element={<AddProduct />}  />
-          </Routes>
-        </Layout>
-
-      ) : (
-          <Routes>
-             <Route path="/" element={<VendorsLogin />} />
-             <Route path="/vendoraccount" element={<VendorsAccount />} />
-             <Route path="/vendor-email-confirmation/:token" element={<Vendoremailconfirmation />} />
-             <Route path="/finalsection" element={<FinalSection />} />
-          </Routes>
-         
-      )}
-    </>
-
-  );
-
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/settings" element={<Settings />} />
+                        <Route
+                            path="/product/:id"
+                            element={<ProductDetails />}
+                        />
+                        <Route path="/add-product" element={<AddProduct />} />
+                    </Routes>
+                </Layout>
+            ) : (
+                <Routes>
+                    <Route path="/" element={<VendorsLogin />} />
+                    <Route path="/vendoraccount" element={<VendorsAccount />} />
+                    <Route
+                        path="/vendor-email-confirmation/:token"
+                        element={<Vendoremailconfirmation />}
+                    />
+                    <Route path="/kyc" element={<FinalSection />} />
+                    <Route path="/store-setup" element={<SetupStore />} />
+                </Routes>
+            )}
+        </>
+    );
 };
 
 export default AppRoutes;

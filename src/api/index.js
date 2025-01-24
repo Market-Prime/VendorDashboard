@@ -22,7 +22,7 @@ const ApiController = () => {
 
     apiClient.interceptors.response.use(
         (response) => {
-            return response.data;
+            return response;
         },
         async (error) => {
             if (error.response && error.response.status === 401) {
@@ -46,7 +46,7 @@ const ApiController = () => {
                         );
                 } catch (error) {
                     error?.status == 401 &&
-                        (window.location.href = `/login?redirect=${window.location.pathname}`);
+                        (window.location.href = `/?redirect=${window.location.pathname}`);
                 }
 
                 return;
@@ -62,7 +62,16 @@ const ApiController = () => {
         }
         return formData;
     };
-    return{
+    const extractErrorInfo = (error) => {
+        return (
+            error?.response?.data?.message ||
+            error?.response?.data?.error ||
+            error?.response?.data?.details ||
+            error?.message ||
+            "An unknown error occured please try again"
+        );
+    };
+    return {
         loadProfile: async () => {
             try {
                 const response = await apiClient.get(
@@ -75,13 +84,45 @@ const ApiController = () => {
                 );
                 return response.data;
             } catch (error) {
-                throw error;
+                throw extractErrorInfo(error);
             }
         },
-        getProducts: async () => {
+        kyc: async (payload) => {
+            try {
+                const response = await apiClient.post(
+                    `${serverUrl}/account/vendor/setup/kyc/`,
+                    _prepareData(payload),
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    }
+                );
+                return response.data;
+            } catch (error) {
+                throw extractErrorInfo(error);
+            }
+        },
+        store: async (payload) => {
+            try {
+                const response = await apiClient.post(
+                    `${serverUrl}/account/vendor/setup/store/`,
+                    _prepareData(payload),
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    }
+                );
+                return response.data;
+            } catch (error) {
+                throw extractErrorInfo(error);
+            }
+        },
+        getProducts: async (st_id) => {
             try {
                 const response = await apiClient.get(
-                    `${serverUrl}/store/MP-v-pet36/products/`,
+                    `${serverUrl}/store/${st_id}/products/`,
                     {
                         headers: {
                             "Content-Type": "multipart/form-data",
@@ -93,10 +134,10 @@ const ApiController = () => {
                 throw error;
             }
         },
-        getProductsDetails: async () => {
+        getProductsDetails: async (id) => {
             try {
                 const response = await apiClient.get(
-                    `${serverUrl}/products/215/`,
+                    `${serverUrl}/products/${id}/`,
                     {
                         headers: {
                             "Content-Type": "multipart/form-data",
@@ -105,7 +146,7 @@ const ApiController = () => {
                 );
                 return response.data;
             } catch (error) {
-                throw error;
+                throw extractErrorInfo(error);
             }
         },
         getProductsItems: async () => {
@@ -123,40 +164,43 @@ const ApiController = () => {
                 throw error;
             }
         },
-        addProductsItems: async () => {
+        addProductsItems: async (pId, payload) => {
             try {
                 const response = await apiClient.post(
-                    `${serverUrl}/product/108/items/`,
+                    `${serverUrl}/product/${pId}/items/`,
+                    payload,
                     {
                         headers: {
-                            "Content-Type": "multipart/form-data",
+                            "Content-Type": "application/json",
                         },
                     }
                 );
                 return response.data;
             } catch (error) {
-                throw error;
+                throw extractErrorInfo(error);
             }
         },
-        uploadProducts: async () => {
+        uploadProduct: async (payload, variable) => {
+            console.log(payload);
             try {
                 const response = await apiClient.post(
-                    `${serverUrl}/product/`,
+                    `${serverUrl}/product/${variable ? "?type=variable" : ""}`,
+                    payload,
                     {
                         headers: {
-                            "Content-Type": "multipart/form-data",
+                            "Content-Type": "application/json",
                         },
                     }
                 );
                 return response.data;
             } catch (error) {
-                throw error;
+                throw extractErrorInfo(error);
             }
         },
-        deleteProductItem: async () => {
+        deleteProductItem: async (id, itemId) => {
             try {
                 const response = await apiClient.delete(
-                    `${serverUrl}/product/108/items/?piId=77/`,
+                    `${serverUrl}/product/${id}/items/?piId=${itemId}`,
                     {
                         headers: {
                             "Content-Type": "multipart/form-data",
@@ -165,13 +209,13 @@ const ApiController = () => {
                 );
                 return response.data;
             } catch (error) {
-                throw error;
+                throw extractErrorInfo(error);
             }
         },
-        deleteProduct: async () => {
+        deleteProduct: async (id) => {
             try {
                 const response = await apiClient.delete(
-                    `${serverUrl}/products/215/`,
+                    `${serverUrl}/products/${id}/`,
                     {
                         headers: {
                             "Content-Type": "multipart/form-data",
@@ -180,7 +224,7 @@ const ApiController = () => {
                 );
                 return response.data;
             } catch (error) {
-                throw error;
+                throw extractErrorInfo(error);
             }
         },
         updateProduct: async () => {
@@ -198,174 +242,7 @@ const ApiController = () => {
                 throw error;
             }
         },
-        kyc: async () => {
-            try {
-                const response = await apiClient.post(
-                    `${serverUrl}/account/vendor/setup/kyc/`,
-                    {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
-                return response.data;
-            } catch (error) {
-                throw error;
-            }
-        },
-        store: async () =>{
-            try {
-                const response = await apiClient.post(
-                    `${serverUrl}/account/vendor/setup/store/`,
-                    {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
-                return response.data;
-            } catch (error) {
-                throw error;
-            }
-        }
-        
-    }
-
-    // return {
-    //     loadProfile: async () => {
-    //         try {
-    //             const response = await apiClient.get(
-    //                 `${serverUrl}/account/admin/profile/`,
-    //                 {
-    //                     headers: {
-    //                         "Content-Type": "multipart/form-data",
-    //                     },
-    //                 }
-    //             );
-    //             return response.data;
-    //         } catch (error) {
-    //             throw error;
-    //         }
-    //     },
-
-    //     getManagers: async () => {
-    //         try {
-    //             const response = await apiClient.get(
-    //                 `${serverUrl}/account/manager/`,
-    //                 {
-    //                     headers: {
-    //                         "Content-Type": "multipart/form-data",
-    //                     },
-    //                 }
-    //             );
-    //             return response;
-    //         } catch (error) {
-    //             console.log(error);
-    //             throw error.response.data;
-    //         }
-    //     },
-
-    //     createManager: async (payload) => {
-    //         try {
-    //             const response = await apiClient.post(
-    //                 `${serverUrl}/account/manager/`,
-    //                 _prepareData(payload),
-    //                 {
-    //                     headers: {
-    //                         "Content-Type": "multipart/form-data",
-    //                     },
-    //                 }
-    //             );
-    //             return response;
-    //         } catch (error) {
-    //             console.log(error);
-    //             throw error.response.data;
-    //         }
-    //     },
-    //     deleteManager: async (staff_id) => {
-    //         try {
-    //             const response = await apiClient.delete(
-    //                 `${serverUrl}/account/manager/${staff_id}/`,
-    //                 {
-    //                     headers: {
-    //                         "Content-Type": "multipart/form-data",
-    //                     },
-    //                 }
-    //             );
-    //             return response;
-    //         } catch (error) {
-    //             console.log(error);
-    //             throw error.response.data;
-    //         }
-    //     },
-    //     getManager: async (staff_id) => {
-    //         try {
-    //             const response = await apiClient.get(
-    //                 `${serverUrl}/account/manager/${staff_id}/`,
-    //                 {
-    //                     headers: {
-    //                         "Content-Type": "multipart/form-data",
-    //                     },
-    //                 }
-    //             );
-    //             return response;
-    //         } catch (error) {
-    //             console.log(error);
-    //             throw error.response.data;
-    //         }
-    //     },
-    //     toogleManagerStatus: async (psk, staff_id, action) => {
-    //         try {
-    //             const response = await apiClient.patch(
-    //                 `${serverUrl}/account/manager/${staff_id}/${
-    //                     action ? "activate" : "deactivate"
-    //                 }/`,
-    //                 _prepareData({ psk }),
-    //                 {
-    //                     headers: {
-    //                         "Content-Type": "multipart/form-data",
-    //                     },
-    //                 }
-    //             );
-    //             return response;
-    //         } catch (error) {
-    //             console.log(error);
-    //             throw error.response.data;
-    //         }
-    //     },
-    //     getVendors: async () => {
-    //         try {
-    //             const response = await apiClient.get(
-    //                 `${serverUrl}/account/vendors/`,
-    //                 {
-    //                     headers: {
-    //                         "Content-Type": "multipart/form-data",
-    //                     },
-    //                 }
-    //             );
-    //             return response;
-    //         } catch (error) {
-    //             console.log(error);
-    //             throw error.response.data;
-    //         }
-    //     },
-    //     getVendor: async (store_id) => {
-    //         try {
-    //             const response = await apiClient.get(
-    //                 `${serverUrl}/account/vendor/profile/?v-id=${store_id}`,
-    //                 {
-    //                     headers: {
-    //                         "Content-Type": "multipart/form-data",
-    //                     },
-    //                 }
-    //             );
-    //             return response;
-    //         } catch (error) {
-    //             console.log(error);
-    //             throw error.response.data;
-    //         }
-    //     }
-    // };
+    };
 };
 
 export default ApiController();

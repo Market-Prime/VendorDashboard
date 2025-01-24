@@ -13,7 +13,7 @@ function EmailConfirmation() {
   console.log('Token:', token); // Log the token to confirm it's being captured
   const confirmEmail = async () =>{
     try{
-        const response = await axios.post(`https://backend-server-0ddt.onrender.com/api/account/confirm/`, {token})
+        const response = await axios.post(`https://mb.marketprime.io/api/account/confirm/`, {token})
         console.log("Response", response);
         toast.success(response.data.message || "Account Confirmed, Please proceed to login with your details", {
             position: "top-right",
