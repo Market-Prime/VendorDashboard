@@ -32,7 +32,7 @@ const SetupKyc = () => {
             })
             .catch((err) => {
                 console.log(err);
-                setUploadStatus(err.message || "An error occurred.");
+                setUploadStatus(err);
             })
             .finally(() => {
                 setUploading(false);

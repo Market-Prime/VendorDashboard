@@ -49,7 +49,6 @@ const SetupStore = () => {
         }));
     };
 
-
     const handleFileChange = (e) => {
         const { name, files } = e.target;
         setFormData((prev) => ({
@@ -93,18 +92,15 @@ const SetupStore = () => {
                 }, 500);
             })
             .catch((err) => {
-                toast.error(
-                    err.response?.data?.message || "An error occurred.",
-                    {
-                        position: "top-right",
-                        autoClose: 5000,
-                        hideProgressBar: true,
-                        closeOnClick: true,
-                        pauseOnHover: true,
-                        draggable: true,
-                        theme: "colored",
-                    }
-                );
+                toast.error(err, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: true,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    theme: "colored",
+                });
             });
     };
 
