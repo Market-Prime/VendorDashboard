@@ -74,12 +74,8 @@ const SetupStore = () => {
 
     const submitStoreData = (e) => {
         e.preventDefault();
-        const formDataToSubmit = new FormData();
-        for (const key in formData) {
-            formDataToSubmit.append(key, formData[key]);
-        }
 
-        ApiClient.store(formDataToSubmit)
+        ApiClient.store(formData)
             .then(() => {
                 toast.success("Store details submitted successfully.", {
                     position: "top-right",
