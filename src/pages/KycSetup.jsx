@@ -28,7 +28,7 @@ const SetupKyc = () => {
         ApiClient.kyc(payload)
             .then((data) => {
                 console.log(data);
-                window.location.href = "/setup";
+                window.location.href = "/setup/store";
             })
             .catch((err) => {
                 console.log(err);
