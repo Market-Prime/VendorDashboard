@@ -45,8 +45,10 @@ const SetupStore = () => {
             ...prev,
             bank_name: e.target.value,
             bank_code: selectedBank?.code || "",
+            bank_type: selectedBank?.type || "",
         }));
     };
+
 
     const handleFileChange = (e) => {
         const { name, files } = e.target;
