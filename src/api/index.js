@@ -46,7 +46,7 @@ const ApiController = () => {
                         );
                 } catch (error) {
                     error?.status == 401 &&
-                        (window.location.href = `/?redirect=${window.location.pathname}`);
+                        (window.location.href = `/auth/login?redirect=${window.location.pathname}`);
                 }
 
                 return;
@@ -181,7 +181,6 @@ const ApiController = () => {
             }
         },
         uploadProduct: async (payload, variable) => {
-            console.log(payload);
             try {
                 const response = await apiClient.post(
                     `${serverUrl}/product/${variable ? "?type=variable" : ""}`,
@@ -193,6 +192,21 @@ const ApiController = () => {
                     }
                 );
                 return response.data;
+            } catch (error) {
+                throw extractErrorInfo(error);
+            }
+        },
+        uploadProductImage: async (id, payload) => {
+            try {
+                const response = await apiClient.post(
+                    `/product/image/${id}/`,
+                    payload,
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    }
+                );
             } catch (error) {
                 throw extractErrorInfo(error);
             }
@@ -216,6 +230,51 @@ const ApiController = () => {
             try {
                 const response = await apiClient.delete(
                     `${serverUrl}/products/${id}/`,
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    }
+                );
+                return response.data;
+            } catch (error) {
+                throw extractErrorInfo(error);
+            }
+        },
+        getCategories: async () => {
+            try {
+                const response = await apiClient.get(`/categories/`, {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+                return response.data;
+            } catch (error) {
+                throw extractErrorInfo(error);
+            }
+        },
+        getCategoryVariationOptions: async (categoryName) => {
+            try {
+                const response = await apiClient.get(
+                    `/categories/variations/${categoryName}/`,
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    }
+                );
+                return response.data;
+            } catch (error) {
+                throw extractErrorInfo(error);
+            }
+        },
+        getCategoryVariationValuesForAnOption: async (
+            categoryName,
+            variationName
+        ) => {
+            try {
+                const response = await apiClient.get(
+                    `/categories/variation-options/${categoryName}/${variationName}/`,
                     {
                         headers: {
                             "Content-Type": "multipart/form-data",

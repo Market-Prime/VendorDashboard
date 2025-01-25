@@ -482,7 +482,7 @@ const ProductDetailsPage = () => {
                                 <img
                                     key={index}
                                     className="w-32 h-32 object-cover rounded-lg"
-                                    src={image}
+                                    src={image.image}
                                     alt={`Product Image ${index + 1}`}
                                 />
                             ))

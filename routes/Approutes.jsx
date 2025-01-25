@@ -3,13 +3,14 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Dashboard from "../src/pages/Dashboard";
 import Orders from "../src/pages/Orders";
 import Products from "../src/pages/Products";
+import Payment from "../src/pages/Payment";
 
 import Profile from "../src/pages/Profile";
 import Settings from "../src/pages/Settings";
 import VendorsLogin from "../src/pages/VendorsLogin";
 import VendorsAccount from "../src/pages/VendorsAccount";
 import Vendoremailconfirmation from "../src/pages/Vendoremailconfirmation";
-import FinalSection from "../src/pages/FinalSection";
+import SetupKyc from "../src/pages/KycSetup";
 import Layout from "../src/components/Layout/layout";
 import ProductDetails from "../src/pages/ProductDetails";
 import AddProduct from "../src/pages/AddProduct";
@@ -19,8 +20,7 @@ import AccountInfo from "../src/pages/AccountInfo";
 const AppRoutes = () => {
     const location = useLocation();
 
-    const noLayoutPattern =
-        /^(\/|\/vendoraccount|\/vendor-email-confirmation\/.*|\/kyc|\/store-setup)$/;
+    const noLayoutPattern = /^\/(auth|setup)(\/|$)/;
     const isLayoutRequired = !noLayoutPattern.test(location.pathname);
 
     return (
@@ -28,10 +28,10 @@ const AppRoutes = () => {
             {isLayoutRequired ? (
                 <Layout>
                     <Routes>
-                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/" element={<Dashboard />} />
                         <Route path="/orders" element={<Orders />} />
                         <Route path="/products" element={<Products />} />
-
+                        <Route path="/payment" element={<Payment />} />
                         <Route path="/profile" element={<Profile />} />
                         <Route path="/settings" element={<Settings />} />
                         <Route
@@ -43,15 +43,18 @@ const AppRoutes = () => {
                 </Layout>
             ) : (
                 <Routes>
-                    <Route path="/" element={<VendorsLogin />} />
-                    <Route path="/vendoraccount" element={<VendorsAccount />} />
-                    <Route path="/confirmeaccount" element={<AccountInfo/>} />
-             <Route
-                        path="/vendor-email-confirmation/token"
+                    <Route path="/auth/login" element={<VendorsLogin />} />
+                    <Route path="/auth/signup" element={<VendorsAccount />} />
+                    <Route
+                        path="/auth/success-signup"
+                        element={<AccountInfo />}
+                    />
+                    <Route
+                        path="/auth/confirm-account/:token"
                         element={<Vendoremailconfirmation />}
                     />
-                    <Route path="/kyc" element={<FinalSection />} />
-                    <Route path="/store-setup" element={<SetupStore />} />
+                    <Route path="/setup/kyc" element={<SetupKyc />} />
+                    <Route path="/setup/store" element={<SetupStore />} />
                 </Routes>
             )}
         </>

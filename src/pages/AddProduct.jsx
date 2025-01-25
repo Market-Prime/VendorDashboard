@@ -6,7 +6,13 @@ import { BsImage } from "react-icons/bs";
 import { GiCancel } from "react-icons/gi";
 import { useNavigate } from "react-router-dom";
 
-const ItemVariation = ({ index, removeItem, updateState, data }) => {
+const ItemVariation = ({
+    index,
+    removeItem,
+    updateState,
+    data,
+    variationData,
+}) => {
     const [variations, setVariations] = useState([{ name: "", value: "" }]);
     const [additionalPrice, setAdditionalPrice] = useState("");
     const [qty, setQty] = useState("");
@@ -56,8 +62,7 @@ const ItemVariation = ({ index, removeItem, updateState, data }) => {
                             <label className="block text-xs font-medium mb-1">
                                 Variation Option Name
                             </label>
-                            <input
-                                type="text"
+                            <select
                                 value={_d.name}
                                 onChange={(e) =>
                                     handleVariationChange(
@@ -66,16 +71,21 @@ const ItemVariation = ({ index, removeItem, updateState, data }) => {
                                         e.target.value
                                     )
                                 }
-                                className="w-full px-3 py-2 border rounded-md"
-                                placeholder="e.g., Size"
-                            />
+                                className="w-full px-3 py-2 text-xs border rounded-md appearance-none"
+                            >
+                                <option value={null}>Select option</option>
+                                {Object.keys(variationData).map((name, i) => (
+                                    <option value={name} key={i}>
+                                        {name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                         <div className="flex-1">
                             <label className="block text-xs font-medium mb-1">
                                 Variation Option Value
                             </label>
-                            <input
-                                type="text"
+                            <select
                                 value={_d.value}
                                 onChange={(e) =>
                                     handleVariationChange(
@@ -84,9 +94,20 @@ const ItemVariation = ({ index, removeItem, updateState, data }) => {
                                         e.target.value
                                     )
                                 }
-                                className="w-full px-3 py-2 border rounded-md"
-                                placeholder="e.g., Large"
-                            />
+                                className="w-full px-3 py-2 text-xs border rounded-md appearance-none"
+                            >
+                                <option value={null}>Select Value</option>
+                                {variationData[variations[index]?.name]?.map(
+                                    (value) => (
+                                        <option
+                                            value={value.value}
+                                            key={value.id}
+                                        >
+                                            {value.value}
+                                        </option>
+                                    )
+                                )}
+                            </select>
                         </div>
                         <button
                             type="button"
@@ -154,8 +175,38 @@ const ProductUploadForm = () => {
     const [serialFields, setSerialFields] = useState({});
     const [error, setError] = useState(null);
 
-    const navigate = useNavigate();
+    const [categories, setCategories] = useState([]);
+    const [variationsData, setVariationsData] = useState({});
 
+    useEffect(() => {
+        ApiClient.getCategories().then((data) => {
+            setCategories(data);
+        });
+    }, []);
+
+    useEffect(() => {
+        if (serialFields.category) {
+            ApiClient.getCategoryVariationOptions(serialFields.category).then(
+                async (catOpts) => {
+                    const _variationData = {};
+
+                    const promises = catOpts.map((opt) =>
+                        ApiClient.getCategoryVariationValuesForAnOption(
+                            serialFields.category,
+                            opt.name
+                        ).then((optVals) => {
+                            _variationData[opt.name] = optVals;
+                        })
+                    );
+
+                    await Promise.all(promises);
+                    setVariationsData(_variationData);
+                }
+            );
+        }
+    }, [serialFields.category]);
+
+    const navigate = useNavigate();
     const addItem = () => {
         const newKey = `key_${Object.entries(items).length}`;
         setItems({
@@ -222,7 +273,6 @@ const ProductUploadForm = () => {
             );
             return;
         }
-        console.log(baseImage);
 
         if (!baseImage) {
             setError("Base Image required");
@@ -255,14 +305,23 @@ const ProductUploadForm = () => {
 
         const payload = {
             ...serialFields,
-            images: otherImages,
-            base_image: baseImage,
             ...(enableVariations && { variation_data }),
+        };
+
+        const payload2 = {
+            base_image: baseImage,
+            ...otherImages.reduce((acc, img, i) => {
+                acc[`img_${i}`] = img;
+                return acc;
+            }, {}),
         };
 
         ApiClient.uploadProduct(payload, enableVariations)
             .then((data) => {
-                navigate("/products");
+                const pId = data.product.id;
+                ApiClient.uploadProductImage(pId, payload2).then((data) => {
+                    navigate("/products");
+                });
             })
             .catch((err) => {
                 setError(err);
@@ -355,9 +414,11 @@ const ProductUploadForm = () => {
                             }}
                         >
                             <option value={null}>Select category</option>
-                            <option>Category 1</option>
-                            <option>Category 2</option>
-                            <option value="Tops">Tops</option>
+                            {categories.map((cat, i) => (
+                                <option key={cat.id} value={cat.name}>
+                                    {cat.name}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <div>
@@ -470,6 +531,7 @@ const ProductUploadForm = () => {
                                     updateState={updateItemState}
                                     removeItem={removeItem}
                                     data={v}
+                                    variationData={variationsData}
                                 />
                             ))}
                         </div>

@@ -54,7 +54,7 @@ const Sidebar = () => {
 
       {/* Navigation Links */}
       <nav className="flex flex-col space-y-4 mt-6 flex-grow px-3">
-        <Link to="/dashboard" className={getLinkClasses("/")}>
+        <Link to="/" className={getLinkClasses("/")}>
           <FaHome size={18} /> {!isCollapsed && <span>Dashboard</span>}
         </Link>
         <Link to="/orders" className={getLinkClasses("/orders")}>

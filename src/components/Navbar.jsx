@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { FaBell, FaCaretDown } from "react-icons/fa";
 import logo from "../assets/logo.png";
+import { useNavigate } from "react-router-dom";
+import LogoutBtn from "./logoutBtn";
 
 const Navbar = ({ profileData }) => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+
+    const navigate = useNavigate();
 
     const toggleDropdown = () => {
         setDropdownOpen(!dropdownOpen);
@@ -12,7 +16,7 @@ const Navbar = ({ profileData }) => {
 
     const handleSearch = (e) => {
         if (e.key === "Enter" && searchQuery.trim()) {
-            console.log("Search query:", searchQuery); // Replace with actual search functionality
+            console.log("Search query:", searchQuery);
             setSearchQuery("");
         }
     };
@@ -83,24 +87,20 @@ const Navbar = ({ profileData }) => {
                     </div>
 
                     {/* Dropdown Menu */}
-                    {dropdownOpen && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-10">
-                            <button
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
-                                onClick={() =>
-                                    console.log("Profile Settings clicked")
-                                }
-                            >
-                                Profile Settings
-                            </button>
-                            <button
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-800 hover:bg-gray-100"
-                                onClick={() => console.log("Logout clicked")}
-                            >
-                                Logout
-                            </button>
-                        </div>
-                    )}
+
+                    <div
+                        className={`absolute ${
+                            dropdownOpen ? "flex-col" : "hidden"
+                        } py-4 px-4 items-center right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-10`}
+                    >
+                        <button
+                            className="block w-full text-sm my-2 p-1 text-gray-800 hover:bg-gray-100"
+                            onClick={() => navigate("/profile")}
+                        >
+                            Profile Settings
+                        </button>
+                        <LogoutBtn />
+                    </div>
                 </div>
             </div>
         </div>

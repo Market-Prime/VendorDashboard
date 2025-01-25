@@ -1,6 +1,6 @@
 const appRoutes = {
-    kycSetup: "/kyc",
-    storeSetup: "/setup",
+    kycSetup: "/setup/kyc",
+    storeSetup: "/setup/store",
 };
 
 export default appRoutes;

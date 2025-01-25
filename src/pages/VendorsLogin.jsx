@@ -2,7 +2,7 @@ import { useState } from "react";
 import logo from "../assets/Logo 1.png";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Import CSS for toast
+import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
 const VendorLogin = () => {
@@ -39,10 +39,12 @@ const VendorLogin = () => {
                 style: { backgroundColor: "green" },
             });
 
-            // Redirect after successful login
+            let redirectTo = "/";
+            const params = new URLSearchParams(window.location.search);
+            if (params.has("redirect")) redirectTo = params.get("redirect");
             setTimeout(() => {
-                navigate("/dashboard");
-            }, 5000);
+                navigate(redirectTo);
+            }, 500);
         } catch (error) {
             const errorMessage =
                 error?.response?.data?.message ||
@@ -183,7 +185,7 @@ const VendorLogin = () => {
                     <p className="mt-4 text-center text-sm">
                         Don’t have an account yet?{" "}
                         <a
-                            href="/vendoraccount"
+                            href="/auth/signup"
                             className="text-blue-500 hover:underline"
                         >
                             Create an account
