@@ -175,7 +175,7 @@ const ProductUploadForm = () => {
     const [serialFields, setSerialFields] = useState({});
     const [error, setError] = useState(null);
 
-    const [categories, setCategories] = useState([]);
+    const [categories, setCategories] = useState({ root: [], sub: [] });
     const [variationsData, setVariationsData] = useState({});
 
     useEffect(() => {
@@ -414,7 +414,7 @@ const ProductUploadForm = () => {
                             }}
                         >
                             <option value={null}>Select category</option>
-                            {categories.map((cat, i) => (
+                            {categories?.sub?.map((cat, i) => (
                                 <option key={cat.id} value={cat.name}>
                                     {cat.name}
                                 </option>
