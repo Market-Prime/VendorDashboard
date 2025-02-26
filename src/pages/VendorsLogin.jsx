@@ -162,7 +162,7 @@ const VendorLogin = () => {
               <span className="ml-2 text-gray-600">Remember me</span>
             </label>
             <a
-              href="/forgot-password"
+              href="/auth/forgot-password"
               className="text-sm text-blue-500 hover:underline"
             >
               Forgot Password?

@@ -2,30 +2,30 @@ import React, { useState } from "react";
 
 const Payment = () => {
   const [payments, setPayments] = useState([
-    {
-      id: "PAY12345",
-      date: "2025-01-01",
-      method: "Credit Card",
-      amount: "$500.00",
-      status: "Completed",
-      details: "Payment for order ORD12345.",
-    },
-    {
-      id: "PAY67890",
-      date: "2025-01-02",
-      method: "PayPal",
-      amount: "$300.00",
-      status: "Pending",
-      details: "Payment for order ORD67890.",
-    },
-    {
-      id: "PAY11223",
-      date: "2025-01-03",
-      method: "Bank Transfer",
-      amount: "$700.00",
-      status: "Failed",
-      details: "Payment for order ORD11223.",
-    },
+    // {
+    //   id: "PAY12345",
+    //   date: "2025-01-01",
+    //   method: "Credit Card",
+    //   amount: "$500.00",
+    //   status: "Completed",
+    //   details: "Payment for order ORD12345.",
+    // },
+    // {
+    //   id: "PAY67890",
+    //   date: "2025-01-02",
+    //   method: "PayPal",
+    //   amount: "$300.00",
+    //   status: "Pending",
+    //   details: "Payment for order ORD67890.",
+    // },
+    // {
+    //   id: "PAY11223",
+    //   date: "2025-01-03",
+    //   method: "Bank Transfer",
+    //   amount: "$700.00",
+    //   status: "Failed",
+    //   details: "Payment for order ORD11223.",
+    // },
   ]);
 
   const handlePaymentSettings = () => {
