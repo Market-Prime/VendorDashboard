@@ -356,7 +356,7 @@ const ProductUploadForm = () => {
                         <label className="block text-gray-700 font-medium">
                             Base Image
                         </label>
-                        <div className="w-full max-w-80 mx-auto aspect-square border border-blue-500 border-solid rounded-lg p-0.5 relative">
+                        <div className="w-full max-w-80 mx-auto aspect-square border overflow-hidden border-blue-500 border-solid rounded-lg p-0.5 relative">
                             <div className="w-full h-full flex items-center justify-center">
                                 {!baseImage ? (
                                     <div className="flex-col items-center text-center justify-center p-2">

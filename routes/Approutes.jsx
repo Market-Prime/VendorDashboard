@@ -16,43 +16,59 @@ import ProductDetails from "../src/pages/ProductDetails";
 import AddProduct from "../src/pages/AddProduct";
 import SetupStore from "../src/pages/StoreSetup";
 import AccountInfo from "../src/pages/AccountInfo";
+import ForgotPassword from "../src/pages/ForgotPassword";
+import ResetPassword from "../src/pages/ResetPassword";
 
 const AppRoutes = () => {
-  const location = useLocation();
+    const location = useLocation();
 
-  const noLayoutPattern = /^\/(auth|setup)(\/|$)/;
-  const isLayoutRequired = !noLayoutPattern.test(location.pathname);
+    const noLayoutPattern = /^\/(auth|setup)(\/|$)/;
+    const isLayoutRequired = !noLayoutPattern.test(location.pathname);
 
-  return (
-    <>
-      {isLayoutRequired ? (
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/payment" element={<Payment />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/product/:id" element={<ProductDetails />} />
-            <Route path="/add-product" element={<AddProduct />} />
-          </Routes>
-        </Layout>
-      ) : (
-        <Routes>
-          <Route path="/auth/login" element={<VendorsLogin />} />
-          <Route path="/auth/signup" element={<VendorsAccount />} />
-          <Route path="/auth/success-signup" element={<AccountInfo />} />
-          <Route
-            path="/auth/confirm-account/:token"
-            element={<Vendoremailconfirmation />}
-          />
-          <Route path="/setup/kyc" element={<SetupKyc />} />
-          <Route path="/setup/store" element={<SetupStore />} />
-        </Routes>
-      )}
-    </>
-  );
+    return (
+        <>
+            {isLayoutRequired ? (
+                <Layout>
+                    <Routes>
+                        <Route path="/" element={<Dashboard />} />
+                        <Route path="/orders" element={<Orders />} />
+                        <Route path="/products" element={<Products />} />
+                        <Route path="/payment" element={<Payment />} />
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/settings" element={<Settings />} />
+                        <Route
+                            path="/product/:id"
+                            element={<ProductDetails />}
+                        />
+                        <Route path="/add-product" element={<AddProduct />} />
+                    </Routes>
+                </Layout>
+            ) : (
+                <Routes>
+                    <Route path="/auth/login" element={<VendorsLogin />} />
+                    <Route path="/auth/signup" element={<VendorsAccount />} />
+                    <Route
+                        path="/auth/success-signup"
+                        element={<AccountInfo />}
+                    />
+                    <Route
+                        path="/auth/confirm-account/:token"
+                        element={<Vendoremailconfirmation />}
+                    />
+                    <Route
+                        path="/auth/forgot-password"
+                        element={<ForgotPassword />}
+                    />
+                    <Route
+                        path="/auth/reset-password/:confirmation_token"
+                        element={<ResetPassword />}
+                    />
+                    <Route path="/setup/kyc" element={<SetupKyc />} />
+                    <Route path="/setup/store" element={<SetupStore />} />
+                </Routes>
+            )}
+        </>
+    );
 };
 
 export default AppRoutes;

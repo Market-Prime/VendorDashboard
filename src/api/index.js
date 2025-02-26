@@ -1,6 +1,65 @@
 import axios from "axios";
 import { serverUrl } from "./config";
 
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+    failedQueue.forEach((prom) => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+    failedQueue = [];
+};
+
+const prepareData = (payload, formData = new FormData(), parentKey = "") => {
+    Object.keys(payload).forEach((key) => {
+        const value = payload[key];
+        const formKey = parentKey ? `${parentKey}[${key}]` : key;
+
+        if (
+            value instanceof File ||
+            (typeof File !== "undefined" && value instanceof Blob)
+        ) {
+            formData.append(formKey, value);
+        } else if (typeof value === "object" && value !== null) {
+            prepareData(value, formData, formKey);
+        } else {
+            formData.append(formKey, value);
+        }
+    });
+    return formData;
+};
+
+const extractErrorMessage = (error) => {
+    const errorData =
+        error && error.response && error.response.data
+            ? error.response.data
+            : null;
+    let errorMessage =
+        (errorData && errorData.error) ||
+        (errorData && errorData.detail) ||
+        (errorData && errorData.message) ||
+        error.message ||
+        "An unexpected error occurred.";
+    if (typeof errorMessage != String) {
+        errorMessage = JSON.stringify(errorMessage);
+    }
+    return errorMessage;
+};
+
+const handleRequest = async (request) => {
+    try {
+        const response = await request;
+        return response.data;
+    } catch (err) {
+        throw extractErrorMessage(err);
+    }
+};
+
 const ApiController = () => {
     const apiClient = axios.create({
         baseURL: serverUrl,
@@ -15,17 +74,36 @@ const ApiController = () => {
             }
             return config;
         },
-        (error) => {
-            return Promise.reject(error);
-        }
+        (error) => Promise.reject(error)
     );
 
     apiClient.interceptors.response.use(
-        (response) => {
-            return response;
-        },
+        (response) => response,
+
         async (error) => {
-            if (error.response && error.response.status === 401) {
+            const originalRequest = error.config;
+            if (
+                error &&
+                error.response &&
+                error.response.status === 401 &&
+                originalRequest &&
+                !originalRequest._retry
+            ) {
+                if (isRefreshing) {
+                    return new Promise((resolve, reject) => {
+                        failedQueue.push({ resolve, reject });
+                    })
+                        .then((token) => {
+                            if (token) {
+                                originalRequest.headers.Authorization = `Bearer ${token}`;
+                            }
+                            return apiClient(originalRequest);
+                        })
+                        .catch((err) => Promise.reject(err));
+                }
+
+                originalRequest._retry = true;
+                isRefreshing = true;
                 try {
                     const response = await axios.post(
                         `${serverUrl}/account/login/refresh/`,
@@ -39,268 +117,86 @@ const ApiController = () => {
                             },
                         }
                     );
-                    response.data?.access &&
+                    if (response.data && response.data.access) {
                         localStorage.setItem(
                             "accessToken",
-                            response.data?.access
+                            response.data.access
                         );
-                } catch (error) {
-                    error?.status == 401 &&
-                        (window.location.href = `/auth/login?redirect=${window.location.pathname}`);
+                    }
+                    const token = localStorage.getItem("accessToken");
+                    processQueue(null, token);
+                    isRefreshing = false;
+                    if (token) {
+                        originalRequest.headers = originalRequest.headers || {};
+                        originalRequest.headers.Authorization = `Bearer ${token}`;
+                    }
+                    return apiClient(originalRequest);
+                } catch (refreshError) {
+                    processQueue(refreshError, null);
+                    isRefreshing = false;
+                    window.location.href = `/auth/login?redirect=${window.location.pathname}`;
+                    return Promise.reject(refreshError);
                 }
-
-                return;
             }
             return Promise.reject(error);
         }
     );
 
-    const _prepareData = (payload) => {
-        const formData = new FormData();
-        for (const key in payload) {
-            formData.append(key, payload[key]);
-        }
-        return formData;
-    };
-    const extractErrorInfo = (error) => {
-        return (
-            error?.response?.data?.message ||
-            error?.response?.data?.error ||
-            error?.response?.data?.details ||
-            error?.message ||
-            "An unknown error occured please try again"
-        );
-    };
     return {
-        loadProfile: async () => {
-            try {
-                const response = await apiClient.get(
-                    `${serverUrl}/account/vendor/profile/`,
-                    {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
-                return response.data;
-            } catch (error) {
-                throw extractErrorInfo(error);
-            }
-        },
-        kyc: async (payload) => {
-            try {
-                const response = await apiClient.post(
-                    `${serverUrl}/account/vendor/setup/kyc/`,
-                    _prepareData(payload),
-                    {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
-                return response.data;
-            } catch (error) {
-                throw extractErrorInfo(error);
-            }
-        },
-        store: async (payload) => {
-            try {
-                const response = await apiClient.post(
-                    `${serverUrl}/account/vendor/setup/store/`,
-                    _prepareData(payload),
-                    {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
-                return response.data;
-            } catch (error) {
-                throw extractErrorInfo(error);
-            }
-        },
-        getProducts: async (st_id) => {
-            try {
-                const response = await apiClient.get(
-                    `${serverUrl}/store/${st_id}/products/`,
-                    {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
-                return response.data;
-            } catch (error) {
-                throw error;
-            }
-        },
-        getProductsDetails: async (id) => {
-            try {
-                const response = await apiClient.get(
-                    `${serverUrl}/products/${id}/`,
-                    {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
-                return response.data;
-            } catch (error) {
-                throw extractErrorInfo(error);
-            }
-        },
-        getProductsItems: async () => {
-            try {
-                const response = await apiClient.get(
-                    `${serverUrl}/product/108/items/`,
-                    {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
-                return response.data;
-            } catch (error) {
-                throw error;
-            }
-        },
-        addProductsItems: async (pId, payload) => {
-            try {
-                const response = await apiClient.post(
-                    `${serverUrl}/product/${pId}/items/`,
-                    payload,
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
-                return response.data;
-            } catch (error) {
-                throw extractErrorInfo(error);
-            }
-        },
-        uploadProduct: async (payload, variable) => {
-            try {
-                const response = await apiClient.post(
-                    `${serverUrl}/product/${variable ? "?type=variable" : ""}`,
-                    payload,
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                    }
-                );
-                return response.data;
-            } catch (error) {
-                throw extractErrorInfo(error);
-            }
-        },
-        uploadProductImage: async (id, payload) => {
-            try {
-                const response = await apiClient.post(
-                    `/product/image/${id}/`,
-                    payload,
-                    {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
-            } catch (error) {
-                throw extractErrorInfo(error);
-            }
-        },
-        deleteProductItem: async (id, itemId) => {
-            try {
-                const response = await apiClient.delete(
-                    `${serverUrl}/product/${id}/items/?piId=${itemId}`,
-                    {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
-                return response.data;
-            } catch (error) {
-                throw extractErrorInfo(error);
-            }
-        },
-        deleteProduct: async (id) => {
-            try {
-                const response = await apiClient.delete(
-                    `${serverUrl}/products/${id}/`,
-                    {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
-                return response.data;
-            } catch (error) {
-                throw extractErrorInfo(error);
-            }
-        },
-        getCategories: async () => {
-            try {
-                const response = await apiClient.get(`/categories/`, {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                });
-                return response.data;
-            } catch (error) {
-                throw extractErrorInfo(error);
-            }
-        },
-        getCategoryVariationOptions: async (categoryName) => {
-            try {
-                const response = await apiClient.get(
-                    `/categories/variations/${categoryName}/`,
-                    {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
-                return response.data;
-            } catch (error) {
-                throw extractErrorInfo(error);
-            }
-        },
-        getCategoryVariationValuesForAnOption: async (
-            categoryName,
-            variationName
-        ) => {
-            try {
-                const response = await apiClient.get(
-                    `/categories/variation-options/${categoryName}/${variationName}/`,
-                    {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
-                return response.data;
-            } catch (error) {
-                throw extractErrorInfo(error);
-            }
-        },
-        updateProduct: async () => {
-            try {
-                const response = await apiClient.put(
-                    `${serverUrl}/products/140/`,
-                    {
-                        headers: {
-                            "Content-Type": "multipart/form-data",
-                        },
-                    }
-                );
-                return response.data;
-            } catch (error) {
-                throw error;
-            }
-        },
+        loadProfile: () =>
+            handleRequest(apiClient.get("/account/vendor/profile/")),
+        kyc: (payload) =>
+            handleRequest(
+                apiClient.post(
+                    "/account/vendor/setup/kyc/",
+                    prepareData(payload)
+                )
+            ),
+        store: (payload) =>
+            handleRequest(
+                apiClient.post(
+                    "/account/vendor/setup/store/",
+                    prepareData(payload)
+                )
+            ),
+        getProducts: (st_id) =>
+            handleRequest(apiClient.get(`/store/${st_id}/products/`)),
+        getProductsDetails: (id) =>
+            handleRequest(apiClient.get(`/products/${id}/`)),
+        getProductsItems: (id) =>
+            handleRequest(apiClient.get(`/product/${id}/items/`)),
+        addProductsItems: (pId, payload) =>
+            handleRequest(apiClient.post(`/product/${pId}/items/`), payload),
+        uploadProduct: (payload, variable) =>
+            handleRequest(
+                apiClient.post(
+                    `/product/${variable ? "?type=variable" : ""}`,
+                    payload
+                )
+            ),
+        uploadProductImage: (id, payload) =>
+            handleRequest(apiClient.post(`/product/image/${id}/`, prepareData(payload))),
+        deleteProductItem: (id, itemId) =>
+            handleRequest(
+                apiClient.delete(`/product/${id}/items/?piId=${itemId}`)
+            ),
+        deleteProduct: (id) =>
+            handleRequest(apiClient.delete(`/products/${id}/`)),
+        getCategories: () => handleRequest(apiClient.get(`/categories/`)),
+        getCategoryVariationOptions: (categoryName) =>
+            handleRequest(
+                apiClient.get(`/categories/variations/${categoryName}/`)
+            ),
+        getCategoryVariationValuesForAnOption: (categoryName, variationName) =>
+            handleRequest(
+                apiClient.get(
+                    `/categories/variation-options/${categoryName}/${variationName}/`
+                )
+            ),
+        updateProduct: (id, payload) =>
+            handleRequest(
+                apiClient.put(`/products/${id}/`, prepareData(payload))
+            ),
     };
 };
 
