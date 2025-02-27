@@ -18,6 +18,7 @@ import SetupStore from "../src/pages/StoreSetup";
 import AccountInfo from "../src/pages/AccountInfo";
 import ForgotPassword from "../src/pages/ForgotPassword";
 import ResetPassword from "../src/pages/ResetPassword";
+import ResendVerification from "../src/pages/ResendVerificationEmail";
 
 const AppRoutes = () => {
     const location = useLocation();
@@ -62,6 +63,10 @@ const AppRoutes = () => {
                     <Route
                         path="/auth/reset-password/:confirmation_token"
                         element={<ResetPassword />}
+                    />
+                    <Route
+                        path="/auth/resend-verification-mail"
+                        element={<ResendVerification />}
                     />
                     <Route path="/setup/kyc" element={<SetupKyc />} />
                     <Route path="/setup/store" element={<SetupStore />} />

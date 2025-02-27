@@ -62,6 +62,11 @@ const VendorLogin = () => {
         theme: "colored",
         style: { backgroundColor: "red" },
       });
+      if (error?.response?.status === 403){
+        setTimeout(()=>{
+          navigate(`/auth/resend-verification-mail?email=${email}`)
+        },1000);
+      }
     } finally {
       setLoading(false);
     }
