@@ -32,7 +32,7 @@ const ResendVerification = () => {
 
     try {
       await axios.post(
-        "https://mb.marketprime.io/api/account/resend-confirmation-email/",
+        "https://backend-server-0ddt.onrender.com/api/account/resend-confirmation-email/",
         { email }
       );
       toast.success("Verification email resent successfully!", {

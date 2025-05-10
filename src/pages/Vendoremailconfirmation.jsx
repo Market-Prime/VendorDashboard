@@ -17,7 +17,7 @@ const EmailConfirmation = () => {
         const confirmEmail = async () => {
             try {
                 const response = await axios.post(
-                    `https://mb.marketprime.io/api/account/confirm/`,
+                    `https://backend-server-0ddt.onrender.com/api/account/confirm/`,
                     { token }
                 );
 

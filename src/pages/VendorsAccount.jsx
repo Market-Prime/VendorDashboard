@@ -54,7 +54,7 @@ const VendorsAccount = () => {
 
     try {
       const response = await axios.post(
-        `https://mb.marketprime.io/api/account/register/?type=vendor`,
+        `https://backend-server-0ddt.onrender.com/api/account/register/?type=vendor`,
         formdata
       );
 

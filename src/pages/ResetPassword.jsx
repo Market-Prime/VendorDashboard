@@ -16,7 +16,7 @@ const ResetPassword = () => {
 
         try {
             await axios.post(
-                `https://mb.marketprime.io/api/account/reset-password/${confirmation_token}/`,
+                `https://backend-server-0ddt.onrender.com/api/account/reset-password/${confirmation_token}/`,
                 {
                     new_password: newPassword,
                 }

@@ -26,7 +26,7 @@ const SetupStore = () => {
   const [step, setStep] = useState(1);
 
     useEffect(() => {
-        axios.get("https://default.marketprime.io/ps/v1/banks").then((res) => {
+        axios.get("https://payment-service-z3pt.onrender.com/v1/banks").then((res) => {
             setBanks(res.data.data);
         });
     }, []);
